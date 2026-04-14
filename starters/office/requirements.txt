@@ -1,0 +1,4 @@
+yagura-agent>=0.1.0
+yagura-tools-common>=0.1.0
+yagura-tools-google>=0.1.0
+yagura-tools-slack>=0.1.0

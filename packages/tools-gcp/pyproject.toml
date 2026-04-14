@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yagura-tools-gcp"
+version = "0.1.0"
+description = "Google Cloud Platform tools (GCS, BigQuery, Cloud Functions) for Yagura."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Kouta", email = "sk-kouta-dev@users.noreply.github.com" }
+]
+license-files = ["LICENSE"]
+keywords = ["ai", "agent", "yagura", "tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "yagura-agent>=0.1.0",
+    "google-cloud-storage>=2.14",
+    "google-cloud-bigquery>=3.17",
+    "google-cloud-functions>=1.15",
+    "httpx>=0.25",
+]
+
+[project.urls]
+Homepage = "https://github.com/sk-kouta-dev/yagura"
+Documentation = "https://github.com/sk-kouta-dev/yagura"
+Repository = "https://github.com/sk-kouta-dev/yagura"
+
+[tool.hatch.build.targets.wheel]
+packages = ["yagura_tools"]

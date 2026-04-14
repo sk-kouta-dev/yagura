@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yagura-state-redis"
+version = "0.1.0"
+description = "Redis-backed StateStore for Yagura."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Kouta", email = "sk-kouta-dev@users.noreply.github.com" }
+]
+license-files = ["LICENSE"]
+keywords = ["ai", "agent", "yagura", "tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "yagura-agent>=0.1.0",
+    "redis>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sk-kouta-dev/yagura"
+Documentation = "https://github.com/sk-kouta-dev/yagura"
+Repository = "https://github.com/sk-kouta-dev/yagura"
+
+[tool.hatch.build.targets.wheel]
+packages = ["yagura_state"]

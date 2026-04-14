@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-yagura}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-yagura}
+      POSTGRES_DB: ${POSTGRES_DB:-yagura}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yagura"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  # Optional local LLM for confidential-data routing.
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollamadata:/root/.ollama
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      ollama:
+        condition: service_started
+    environment:
+      POSTGRES_URL: postgresql://${POSTGRES_USER:-yagura}:${POSTGRES_PASSWORD:-yagura}@postgres:5432/${POSTGRES_DB:-yagura}
+      OLLAMA_HOST: http://ollama:11434
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      DATADOG_API_KEY: ${DATADOG_API_KEY}
+      DATADOG_APP_KEY: ${DATADOG_APP_KEY}
+      DATADOG_SERVICE: yagura-enterprise
+      DATADOG_ENV: ${DATADOG_ENV:-production}
+      OAUTH_ISSUER: ${OAUTH_ISSUER}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      YAGURA_RAG_ENDPOINT: ${YAGURA_RAG_ENDPOINT}
+      YAGURA_CONFIDENTIAL_PATTERNS: ${YAGURA_CONFIDENTIAL_PATTERNS:-/confidential/,/機密/,/internal-only/}
+      YAGURA_MAX_SESSIONS: ${YAGURA_MAX_SESSIONS:-50}
+      YAGURA_PLANNER_MODEL: ${YAGURA_PLANNER_MODEL:-claude-sonnet-4-20250514}
+      YAGURA_EXECUTOR_MODEL: ${YAGURA_EXECUTOR_MODEL:-qwen2.5:7b}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+  redisdata:
+  ollamadata:

@@ -1,0 +1,78 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags: ["v*"]
+
+# PyPI Trusted Publishers (OIDC) — one project registration per PyPI package.
+# Set up 27 Trusted Publishers in PyPI admin, all pointing at this repo +
+# this workflow (publish.yml). See https://docs.pypi.org/trusted-publishers/
+
+jobs:
+  publish-core:
+    name: Publish yagura-agent
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install build
+      - name: Build core
+        run: python -m build
+      - name: Publish core to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  publish-ecosystem:
+    name: Publish ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    needs: publish-core
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - tools-common
+          - tools-aws
+          - tools-gcp
+          - tools-azure
+          - tools-slack
+          - tools-google
+          - tools-microsoft
+          - tools-git
+          - tools-db
+          - tools-browser
+          - tools-docker
+          - tools-k8s
+          - tools-notion
+          - tools-jira
+          - tools-confluence
+          - tools-datadog
+          - tools-snowflake
+          - tools-openapi
+          - tools-scraping
+          - tools-llm
+          - state-postgres
+          - state-redis
+          - state-dynamodb
+          - logger-datadog
+          - logger-cloudwatch
+          - auth-oauth2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install build
+      - name: Build ${{ matrix.package }}
+        working-directory: packages/${{ matrix.package }}
+        run: python -m build
+      - name: Publish ${{ matrix.package }} to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/${{ matrix.package }}/dist/

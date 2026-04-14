@@ -1,0 +1,5 @@
+yagura-agent>=0.1.0
+yagura-tools-common>=0.1.0
+yagura-tools-scraping>=0.1.0
+# Uncomment for OCR support:
+# yagura-tools-scraping[ocr]>=0.1.0

@@ -1,0 +1,7 @@
+yagura-agent>=0.1.0
+yagura-tools-common>=0.1.0
+yagura-tools-docker>=0.1.0
+yagura-tools-k8s>=0.1.0
+yagura-tools-git>=0.1.0
+# For pull-request creation on GitHub:
+# yagura-tools-git[github]>=0.1.0

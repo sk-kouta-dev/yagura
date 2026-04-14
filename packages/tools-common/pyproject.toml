@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yagura-tools-common"
+version = "0.1.0"
+description = "Basic utility tools (shell, file, http, process) for the Yagura agent framework."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Kouta", email = "sk-kouta-dev@users.noreply.github.com" }
+]
+license-files = ["LICENSE"]
+keywords = ["yagura", "agent", "tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "yagura-agent>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+
+[project.urls]
+Homepage = "https://github.com/sk-kouta-dev/yagura"
+Documentation = "https://github.com/sk-kouta-dev/yagura"
+Repository = "https://github.com/sk-kouta-dev/yagura"
+
+[tool.hatch.build.targets.wheel]
+packages = ["yagura_tools"]

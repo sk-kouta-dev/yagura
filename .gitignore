@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+# Build artifacts
+dist/
+build/
+*.whl
+*.tar.gz
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Databases / secrets
+*.db
+*.sqlite
+*.sqlite3
+rsa_key.p8
+credentials/*.json
+credentials/*.key
+
+# Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Internal design documents (not part of the public repo)
+yagura-framework.md
+yagura-ecosystem.md
+yagura-presets-starters.md
+
+# Local audit logs
+*.jsonl
+!tests/**/*.jsonl
+
+# Playwright
+playwright-browsers/
+
+# Starters: user-specific credentials
+starters/office/credentials/*.json
+starters/office/credentials/*.key

@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yagura-agent"
+version = "0.1.0"
+description = "Safety-native AI agent framework. Define tools, Yagura handles the rest."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Kouta", email = "sk-kouta-dev@users.noreply.github.com" }
+]
+license-files = ["LICENSE"]
+keywords = ["ai", "agent", "framework", "safety", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "anthropic",
+    "openai",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+ollama = ["ollama"]
+dev = ["pytest", "pytest-asyncio", "ruff"]
+
+[project.urls]
+Homepage = "https://github.com/sk-kouta-dev/yagura"
+Documentation = "https://github.com/sk-kouta-dev/yagura"
+Repository = "https://github.com/sk-kouta-dev/yagura"
+
+[tool.hatch.build.targets.wheel]
+packages = ["yagura"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test modules use short aliases for readability, and mock Slack-style APIs
+# (chat_postMessage etc.) whose camelCase names mirror the SDK.
+"tests/**/*.py" = ["N802", "N817"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
