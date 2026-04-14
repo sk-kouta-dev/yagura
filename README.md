@@ -69,12 +69,16 @@ print(response.plan)
 
 | Feature | Yagura | LangChain | CrewAI | Google ADK | MS Agent FW |
 |---------|--------|-----------|--------|------------|-------------|
-| Safety in execution loop | ✅ Native | ❌ Add-on | ❌ None | ❌ Callback | ❌ User-implemented |
+| Safety in execution loop | ✅ Native | ❌ Add-on | ❌ None | ⚠️ Callback | ❌ User-built |
 | DangerLevel per tool | ✅ 4 levels | ❌ | ❌ | ❌ | ❌ |
-| Plan confirmation + auto-execute | ✅ Threshold-based | ❌ | ❌ | ⚠️ Per-tool HITL | ❌ |
-| Environment-aware danger | ✅ 5 environments | ❌ | ❌ | ❌ | ❌ |
-| LLM routing by data attribute | ✅ LLMRouter | ❌ | ❌ | ❌ | ❌ |
-| Zero built-in tools | ✅ | ❌ Bundled | ❌ Bundled | ❌ Bundled | ❌ Bundled |
+| Plan confirmation | ✅ Threshold | ❌ | ❌ | ⚠️ Per-tool HITL | ❌ |
+| Environment-aware danger | ✅ 5 envs | ❌ | ❌ | ❌ | ❌ |
+| Multi-agent | ❌ Single | ✅ | ✅ | ✅ | ✅ |
+| GUI builder | ❌ | ⚠️ LangFlow | ❌ | ✅ ADK Web UI | ❌ |
+| Streaming | ✅ | ✅ | ⚠️ Limited | ✅ | ✅ |
+| Multi-language | ❌ Python only | ✅ Py/TS | ✅ Py/TS | ✅ Py/TS/Go/Java | ✅ Py/.NET |
+| Ecosystem size | 26 pkg / 188 tools | 100+ integrations | 20+ tools | Google Cloud native | Azure native |
+| Observability | ✅ OpenTelemetry | ✅ LangSmith | ⚠️ Limited | ✅ Cloud Trace | ✅ OTel |
 
 ## Safety Presets
 
