@@ -127,6 +127,99 @@ async def test_layer3_not_available_accepts_low_confidence_layer2() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Layer 3 low-confidence escalation
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_layer3_low_confidence_escalates_to_destructive() -> None:
+    """If Layer 3 still returns below-threshold confidence, escalate to DESTRUCTIVE."""
+    executor = MockLLMProvider(responses=[assess_response("MODIFY", confidence=0.4)])
+    # Fallback LLM returns READ with LOW confidence (< 0.8).
+    fallback = MockLLMProvider(responses=[assess_response("READ", confidence=0.5, reason="still unsure")])
+    assessor = DangerAssessor(
+        rules=DangerRules.default(),
+        executor_llm=executor,
+        fallback_llm=fallback,
+        confidence_threshold=0.8,
+    )
+    assessment = await assessor.assess(_unknown_tool("mystery_tool"), {"x": 1})
+
+    assert assessment.layer == 3
+    # Escalated from READ → DESTRUCTIVE.
+    assert assessment.level is DangerLevel.DESTRUCTIVE
+    assert assessment.metadata.get("escalated_due_to_low_confidence") is True
+    assert assessment.metadata.get("original_level") == "READ"
+    # Reason explains the escalation.
+    assert "escalated" in assessment.reason
+    assert "still unsure" in assessment.reason  # original reason preserved
+    assert "0.50" in assessment.reason  # confidence rendered
+    assert "0.80" in assessment.reason  # threshold rendered
+
+
+@pytest.mark.asyncio
+async def test_layer3_low_confidence_forces_confirmation_regardless_of_threshold() -> None:
+    """Even with auto_execute_threshold=DESTRUCTIVE (would normally skip confirm),
+    a low-confidence Layer 3 escalation still forces confirmation."""
+    executor = MockLLMProvider(responses=[assess_response("MODIFY", confidence=0.4)])
+    fallback = MockLLMProvider(responses=[assess_response("READ", confidence=0.5)])
+    assessor = DangerAssessor(
+        rules=DangerRules.default(),
+        executor_llm=executor,
+        fallback_llm=fallback,
+        confidence_threshold=0.8,
+        # This threshold would normally auto-execute DESTRUCTIVE plans.
+        auto_execute_threshold=DangerLevel.INSTALL,
+    )
+    assessment = await assessor.assess(_unknown_tool("mystery_tool"), {})
+
+    assert assessment.level is DangerLevel.DESTRUCTIVE
+    assert assessment.requires_confirmation is True
+
+
+@pytest.mark.asyncio
+async def test_layer3_high_confidence_uses_reported_level_unchanged() -> None:
+    """If Layer 3 IS confident, no escalation happens — use its level as-is."""
+    executor = MockLLMProvider(responses=[assess_response("MODIFY", confidence=0.4)])
+    fallback = MockLLMProvider(responses=[assess_response("READ", confidence=0.95, reason="confident read")])
+    assessor = DangerAssessor(
+        rules=DangerRules.default(),
+        executor_llm=executor,
+        fallback_llm=fallback,
+        confidence_threshold=0.8,
+    )
+    assessment = await assessor.assess(_unknown_tool("mystery_tool"), {})
+
+    assert assessment.layer == 3
+    assert assessment.level is DangerLevel.READ  # unchanged; no escalation
+    assert "escalated_due_to_low_confidence" not in assessment.metadata
+    assert assessment.reason == "confident read"
+
+
+@pytest.mark.asyncio
+async def test_layer3_escalation_does_not_downgrade_destructive() -> None:
+    """If Layer 3 already returns DESTRUCTIVE/INSTALL with low confidence,
+    the escalated level is still max(level, DESTRUCTIVE) — never downgraded."""
+    executor = MockLLMProvider(responses=[assess_response("MODIFY", confidence=0.4)])
+    # Layer 3 says INSTALL with low confidence.
+    fallback = MockLLMProvider(responses=[assess_response("INSTALL", confidence=0.3, reason="maybe install")])
+    assessor = DangerAssessor(
+        rules=DangerRules.default(),
+        executor_llm=executor,
+        fallback_llm=fallback,
+        confidence_threshold=0.8,
+    )
+    assessment = await assessor.assess(_unknown_tool("mystery_tool"), {})
+
+    # INSTALL is already higher than DESTRUCTIVE, so escalation keeps INSTALL.
+    assert assessment.level is DangerLevel.INSTALL
+    # But the escalation flag is still set so requires_confirmation is forced.
+    assert assessment.metadata.get("escalated_due_to_low_confidence") is True
+    assert assessment.metadata.get("original_level") == "INSTALL"
+    assert assessment.requires_confirmation is True
+
+
+# ---------------------------------------------------------------------------
 # LLMAssessor JSON parsing edge cases
 # ---------------------------------------------------------------------------
 

@@ -182,9 +182,29 @@ class DangerAssessor:
             assessment.metadata["fallback_skipped"] = True
             return assessment
         layer3 = LLMAssessor(self.fallback_llm, self.confidence_threshold)
-        return await layer3.assess(tool, params, layer=3)
+        layer3_assessment = await layer3.assess(tool, params, layer=3)
+
+        # If even Layer 3 is not confident, escalate to DESTRUCTIVE and force
+        # confirmation. Rationale: with two LLM assessments both uncertain,
+        # we cannot safely execute without a human in the loop — treating as
+        # DESTRUCTIVE is the conservative choice that the spec mandates.
+        if layer3_assessment.confidence < self.confidence_threshold:
+            escalated = max(layer3_assessment.level, DangerLevel.DESTRUCTIVE)
+            layer3_assessment.metadata["escalated_due_to_low_confidence"] = True
+            layer3_assessment.metadata["original_level"] = layer3_assessment.level.name
+            layer3_assessment.reason = (
+                f"Layer 3 confidence {layer3_assessment.confidence:.2f} < "
+                f"threshold {self.confidence_threshold:.2f}; "
+                f"escalated {layer3_assessment.level.name} → {escalated.name} "
+                f"(original reason: {layer3_assessment.reason})"
+            )
+            layer3_assessment.level = escalated
+        return layer3_assessment
 
     def _requires_confirmation(self, assessment: DangerAssessment) -> bool:
+        # Low-confidence escalation: always confirm.
+        if assessment.metadata.get("escalated_due_to_low_confidence"):
+            return True
         # INSTALL always requires admin approval if policy says so.
         if assessment.policy_check and assessment.policy_check.requires_admin_approval:
             return True
