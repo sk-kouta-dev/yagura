@@ -29,7 +29,7 @@ from yagura.safety.reliability import ReliabilityLevel, SearchResult
 from yagura.safety.rules import DangerLevel, DangerRules, ExecutionEnvironment
 from yagura.tools.tool import ExecutionTarget, Tool, ToolResult
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "Agent",

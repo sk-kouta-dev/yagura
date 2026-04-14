@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (2026-04-15)
+
+### Security
+- Layer 3 low-confidence escalation: when fallback LLM confidence is below threshold, automatically escalate to DESTRUCTIVE and force human confirmation regardless of auto_execute_threshold setting
+
+### Ecosystem
+- Remaining 7 packages published: yagura-tools-llm, yagura-tools-microsoft, yagura-tools-notion, yagura-tools-openapi, yagura-tools-scraping, yagura-tools-slack, yagura-tools-snowflake
+
 ## 0.1.0 (2026-04-14)
 
 Initial release.
